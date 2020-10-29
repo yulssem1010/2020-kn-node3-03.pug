@@ -9,7 +9,7 @@ router.get('/create', (req, res, next) => {
 
 router.post('/save', async (req,res,next) =>{
 	const connect = await pool.getConnection();
-	
+
 	const { title, content, isbn, writer, wdate, price } = req.body;
 	const values = [title, content, isbn, writer, wdate, price];
 	const sql = `INSERT INTO books SET title=?, content=?, isbn=?, writer=?, wdate=?, price=?`;
@@ -17,7 +17,7 @@ router.post('/save', async (req,res,next) =>{
  if(result[0].serverStatus ==2){
 	const sql2=`SELECT * FROM books ORDER BY id DESC`;
 	const result2 = await connect.query(sql2);
-	res.json(result2[0]);
+	res.redirect('/sql2/list');
  }else{
 	 res.json({err:"데이터 저장에 실패하였습니다."})
  }
@@ -27,9 +27,9 @@ router.post('/save', async (req,res,next) =>{
 
 router.get('/list', async (req,res,next) =>{
 	const connect = await pool.getConnection();
-	const result = await connect.query('SELECT * FROM books');
+	const result = await connect.query('SELECT * FROM books ORDER BY id DESC');
 	connect.release();	
-	res.json(result);
+	res.render('./book/list.pug',{title : "도서목록" ,scriptFile :"", lists:result[0]});
 });
 
 module.exports = router;
